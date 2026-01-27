@@ -18,11 +18,18 @@ def calculate_round_results(round_obj, carryover_pool):
             # Cap at 4x
             capped_payout = min(base_payout, 4 * bet.amount)
             
-            # All-in bonus
-            if bet.is_all_in:
-                final_payout = capped_payout * 1.5
+            # Multiplier application
+            m = bet.multiplier
+            if m >= 1:
+                # Apply to everything (payout includes returned investment)
+                final_payout = capped_payout * m
             else:
-                final_payout = capped_payout
+                # Apply only to the profit (amount above the original investment)
+                profit = capped_payout - bet.amount
+                if profit > 0:
+                    final_payout = bet.amount + (profit * m)
+                else:
+                    final_payout = capped_payout
             
             results.append({
                 'team_id': bet.team_id,

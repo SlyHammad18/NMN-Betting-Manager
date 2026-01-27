@@ -1,23 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="animate-fade-in text-center">
-    <h1>🏆 Game Finished! 🏆</h1>
-    <p style="color: var(--text-muted); margin-bottom: 2rem;">Behold the final leaderboard.</p>
+<div class="animate-fade-in" style="text-align: center; margin-bottom: 3rem;">
+    <h1 class="text-gradient" style="font-size: 3.5rem; margin-bottom: 0.5rem;">Game Concluded</h1>
+    <p style="color: var(--text-muted); font-size: 1.1rem;">Final investment rankings and portfolio standings.</p>
 </div>
 
-<div class="glass-card animate-fade-in" style="animation-delay: 0.1s; border-color: var(--secondary-color);">
-    <h2>Leaderboard</h2>
+<div class="glass-card animate-fade-in"
+    style="animation-delay: 0.1s; padding: 2.5rem; border-color: var(--secondary-color);">
+    <h2
+        style="margin-bottom: 2.5rem; text-align: center; letter-spacing: 0.2em; text-transform: uppercase; font-size: 1.2rem; color: var(--text-muted);">
+        Leaderboard</h2>
     <div style="display: grid; gap: 1rem;">
-        {% for team in top_teams %}
-        <div class="glass-card"
-            style="margin-bottom: 0px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; background: {{ 'rgba(255, 215, 0, 0.1)' if loop.index == 1 else 'rgba(255,255,255,0.03)' }}">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <span style="font-size: 1.5rem; font-weight: bold; color: var(--secondary-color);">#{{ loop.index
-                    }}</span>
-                <span style="font-size: 1.2rem; font-weight: bold;">{{ team.name }}</span>
+        {% for item in ranked_teams %}
+        {% set team = item.team %}
+        {% set rank = item.rank %}
+        <div
+            style="{% if rank == 1 %}background: linear-gradient(90deg, rgba(252, 211, 77, 0.1), transparent); border: 1px solid rgba(252, 211, 77, 0.3);{% else %}background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);{% endif %} padding: 1.5rem 2rem; border-radius: 1.5rem; display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s ease;">
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <div
+                    style="width: 3rem; height: 3rem; border-radius: 50%; background: {% if rank == 1 %}#fcd34d{% elif rank == 2 %}#e2e8f0{% elif rank == 3 %}#cd7f32{% else %}rgba(255,255,255,0.1){% endif %}; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #000; font-family: 'Outfit', sans-serif;">
+                    {{ rank }}
+                </div>
+                <span style="font-size: 1.4rem; font-weight: 700; color: var(--text-color);">{{ team.name }}</span>
             </div>
-            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-color);">
+            <div class="balance-font" style="font-size: 1.8rem; color: var(--accent-color);">
                 ${{ "%.2f"|format(team.money) }}
             </div>
         </div>
@@ -25,14 +32,14 @@
     </div>
 </div>
 
-<div class="animate-fade-in" style="animation-delay: 0.3s;">
-    <a href="{{ url_for('home') }}" class="btn btn-primary"
-        style="width: 100%; text-align: center; padding: 1.5rem; font-size: 1.2rem;">Back to Home</a>
+<div class="animate-fade-in" style="animation-delay: 0.3s; margin-top: 2rem;">
+    <a href="{{ url_for('home') }}" class="btn btn-primary" style="width: 100%; padding: 1.5rem; font-size: 1.25rem;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        Return to Headquarters
+    </a>
 </div>
-
-<style>
-    .text-center {
-        text-align: center;
-    }
-</style>
 {% endblock %}

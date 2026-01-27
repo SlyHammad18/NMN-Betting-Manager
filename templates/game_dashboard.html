@@ -1,56 +1,174 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="animate-fade-in">
-    <a href="{{ url_for('home') }}"
-        style="color: var(--primary-color); text-decoration: none; margin-bottom: 1rem; display: block;">&larr; Back to
-        Games</a>
-    <h1>{{ game.name }}</h1>
-    <p style="color: var(--text-muted); margin-bottom: 2rem;">Game Status: <span
-            class="badge badge-{{ game.status }}">{{ game.status.capitalize() }}</span></p>
+<div class="animate-fade-in" style="margin-bottom: 2rem;">
+    <a href="{{ url_for('home') }}" class="btn"
+        style="background: rgba(255,255,255,0.05); color: var(--text-muted); padding: 0.5rem 1rem; margin-bottom: 1.5rem;">&larr;
+        Back to Games</a>
+    <h1 style="margin-bottom: 0.5rem;">{{ game.name }}</h1>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+        <span class="badge badge-{{ game.status }}">{{ game.status.capitalize() }}</span>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Created on {{ game.created_at.strftime('%Y-%m-%d')
+            }}</span>
+    </div>
 </div>
 
-<div class="glass-card animate-fade-in" style="animation-delay: 0.1s;">
-    <h2>Teams</h2>
-    <div style="margin-bottom: 2rem;">
+<div class="glass-card animate-fade-in" style="animation-delay: 0.1s; padding: 1.75rem;">
+    <h2 style="display: flex; align-items: center; gap: 0.75rem;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-color)">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        Teams
+    </h2>
+    <div style="display: grid; gap: 0.75rem; margin-bottom: 2rem;">
         {% for team in teams %}
-        <div class="glass-card"
-            style="padding: 1rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
-            <div>
-                <span style="font-weight: bold; font-size: 1.1rem;">{{ team.name }}</span>
-            </div>
-            <div style="color: var(--accent-color); font-weight: bold; font-size: 1.1rem;">
-                ${{ "%.2f"|format(team.money) }}
+        <div
+            style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 1.25rem 1.75rem; border-radius: 1.25rem; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease;">
+            <span style="font-weight: 600; font-size: 1.15rem; color: var(--text-color);">{{ team.name }}</span>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span
+                    style="color: var(--accent-color); font-weight: 800; font-size: 1.3rem; font-family: 'Outfit', sans-serif;">
+                    ${{ "%.2f"|format(team.money) }}
+                </span>
+
+                <details style="position: relative;">
+                    <summary
+                        style="list-style: none; cursor: pointer; color: var(--text-muted); padding: 0.5rem; border-radius: 0.5rem; transition: background 0.2s;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </summary>
+                    <div
+                        style="position: absolute; right: 0; top: 100%; z-index: 10; margin-top: 0.5rem; background: var(--bg-color); border: 1px solid var(--glass-border); padding: 1rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 220px;">
+                        <form action="{{ url_for('edit_team_money', team_id=team.id) }}" method="POST">
+                            <label
+                                style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem; text-transform: uppercase;">Adjust
+                                Balance</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="number" name="money" value="{{ team.money }}" step="0.01"
+                                    style="flex: 1; padding: 0.5rem; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: white; font-size: 0.9rem;">
+                                <button type="submit" class="btn btn-primary" style="padding: 0.5rem; min-width: 44px;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </details>
             </div>
         </div>
         {% else %}
-        <p style="color: var(--text-muted);">No teams added yet.</p>
+        <div
+            style="text-align: center; padding: 2rem; border: 2px dashed var(--glass-border); border-radius: 1.5rem; color: var(--text-muted);">
+            No teams added yet.
+        </div>
         {% endfor %}
     </div>
 
-    <h3>Add Team</h3>
-    <form action="{{ url_for('add_team', game_id=game.id) }}" method="POST" style="display: flex; gap: 1rem;">
+    <form action="{{ url_for('add_team', game_id=game.id) }}" method="POST" style="display: flex; gap: 0.75rem;">
         <div style="flex: 1;">
-            <input type="text" name="name" placeholder="Team Name" required>
+            <input type="text" name="name" placeholder="Enter Team Name" required style="background: rgba(0,0,0,0.2);">
         </div>
-        <button type="submit" class="btn btn-primary">Add</button>
+        <button type="submit" class="btn btn-primary" style="padding-left: 2rem; padding-right: 2rem;">Add Team</button>
     </form>
 </div>
 
 {% if teams|length >= 1 %}
-<div class="glass-card animate-fade-in" style="animation-delay: 0.2s; border-color: var(--primary-color);">
-    <h2>Start Round</h2>
-    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Begin a new betting round for all teams.</p>
-    <a href="{{ url_for('setup_round', game_id=game.id) }}" class="btn btn-primary"
-        style="width: 100%; text-align: center;">New Round</a>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;">
+    <div class="glass-card animate-fade-in" style="animation-delay: 0.2s; border-left: 4px solid var(--primary-color);">
+        <h2>Start New Round</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem;">Initiate a new investment cycle
+            for the active teams.</p>
+        <a href="{{ url_for('setup_round', game_id=game.id) }}" class="btn btn-primary" style="width: 100%;">Start
+            Round</a>
+    </div>
+
+    <div class="glass-card animate-fade-in" style="animation-delay: 0.3s; border-left: 4px solid var(--error-color);">
+        <h2>Finalize Game</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem;">Lock all balances and view the
+            final leaderboard standings.</p>
+        <a href="{{ url_for('end_game', game_id=game.id) }}" class="btn"
+            style="background: rgba(244, 63, 94, 0.1); color: var(--error-color); width: 100%; border: 1px solid rgba(244, 63, 94, 0.2);">End
+            Game</a>
+    </div>
 </div>
 
-<div class="glass-card animate-fade-in" style="animation-delay: 0.3s; border-color: var(--error-color);">
-    <h2>End Game</h2>
-    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Finish the game and show final leaderboard.</p>
-    <a href="{{ url_for('end_game', game_id=game.id) }}" class="btn"
-        style="background: var(--error-color); color: white; width: 100%; text-align: center;">End Game & View
-        Results</a>
+{% set completed_rounds = game.rounds|selectattr('correct_option', 'ne', none)|list|sort(attribute='created_at',
+reverse=True) %}
+{% if completed_rounds %}
+<div class="glass-card animate-fade-in" style="animation-delay: 0.35s;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2 style="margin-bottom: 0;">Round History</h2>
+        <form action="{{ url_for('undo_round', game_id=game.id) }}" method="POST"
+            onsubmit="return confirm('Undo the last round and revert all team balances?')">
+            <button type="submit" class="btn"
+                style="background: rgba(245, 158, 11, 0.1); color: var(--warning-color); border: 1px solid rgba(245, 158, 11, 0.2); padding: 0.6rem 1.25rem; font-size: 0.9rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                </svg>
+                Undo Last Round
+            </button>
+        </form>
+    </div>
+
+    <div
+        style="background: rgba(0,0,0,0.2); border-radius: 1rem; overflow: hidden; border: 1px solid var(--glass-border);">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: rgba(255,255,255,0.03);">
+                    <th style="text-align: left; padding: 1.25rem;">Round</th>
+                    <th style="text-align: left; padding: 1.25rem;">Resulting Outcome</th>
+                    <th style="text-align: left; padding: 1.25rem;">Performance Breakdown</th>
+                    <th style="text-align: right; padding: 1.25rem;">Pool Carryover</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rd in completed_rounds %}
+                <tr>
+                    <td style="padding: 1.25rem; font-weight: 600;">Round {{ completed_rounds|length - loop.index0 }}
+                    </td>
+                    <td style="padding: 1.25rem;">
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-size: 0.9rem;">
+                            {% if rd.correct_option == 1 %}{{ rd.opt1 }}{% elif rd.correct_option == 2 %}{{ rd.opt2 }}{%
+                            elif rd.correct_option == 3 %}{{ rd.opt3 }}{% elif rd.correct_option == 4 %}{{ rd.opt4 }}{%
+                            else %}{{ rd.opt5 }}{% endif %}
+                        </span>
+                    </td>
+                    <td style="padding: 1.25rem;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            {% for bet in rd.bets %}
+                            {% set net = bet.payout - bet.amount %}
+                            <div
+                                style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 0.35rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--text-muted); font-size: 0.7rem;">{{ bet.team.name }}</span>
+                                <span
+                                    style="font-weight: 700; color: {{ 'var(--accent-color)' if net > 0 else 'var(--error-color)' if net < 0 else 'var(--text-muted)' }}">
+                                    {{ '+' if net > 0 }}{{ "%.2f"|format(net) }}
+                                </span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td style="padding: 1.25rem; text-align: right; color: var(--accent-color); font-weight: 600;">
+                        ${{ "%.2f"|format(rd.previous_carryover) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+{% endif %}
 {% endif %}
 {% endblock %}

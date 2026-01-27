@@ -1,36 +1,44 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="animate-fade-in text-center">
-    <h1>Round Results</h1>
-    <h2 style="color: var(--primary-color);">Correct Option: {{ correct_option }} -
-        {% if correct_option==1 %}{{ round_obj.opt1 }}{% elif correct_option==2 %}{{ round_obj.opt2 }}{% elif
-        correct_option==3 %}{{ round_obj.opt3 }}{% elif correct_option==4 %}{{ round_obj.opt4 }}{% else %}{{
-        round_obj.opt5 }}{% endif %}
-    </h2>
-    <p style="color: var(--text-muted); margin-bottom: 2rem;">Payouts have been calculated and applied.</p>
+<div class="animate-fade-in" style="text-align: center; margin-bottom: 3rem;">
+    <h1 class="text-gradient" style="font-size: 3rem; margin-bottom: 0.5rem;">Round Results</h1>
+    <div class="glass-card" style="display: inline-block; padding: 1rem 2rem; border-color: var(--primary-color);">
+        <span
+            style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 0.5rem;">Winning
+            Outcome</span>
+        <h2 style="margin: 0; color: var(--text-color);">
+            {% if correct_option==1 %}{{ round_obj.opt1 }}{% elif correct_option==2 %}{{ round_obj.opt2 }}{% elif
+            correct_option==3 %}{{ round_obj.opt3 }}{% elif correct_option==4 %}{{ round_obj.opt4 }}{% else %}{{
+            round_obj.opt5 }}{% endif %}
+        </h2>
+    </div>
 </div>
 
 <div class="glass-card animate-fade-in" style="animation-delay: 0.1s;">
-    <h2>Payout Details</h2>
+    <h2 style="margin-bottom: 2rem;">Investment Performance</h2>
     <div style="display: grid; gap: 1rem;">
         {% for res in results %}
         {% set team = game.teams|selectattr('id', 'equalto', res.team_id)|first %}
-        <div class="glass-card"
-            style="margin-bottom: 0px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid {{ 'var(--accent-color)' if res.is_winner else 'var(--error-color)' }};">
+        <div class="result-card"
+            style="border-left: 4px solid {{ 'var(--accent-color)' if res.is_winner else 'rgba(255,255,255,0.1)' }};">
             <div>
-                <span style="font-weight: bold;">{{ team.name }}</span>
+                <span style="font-weight: 700; font-size: 1.1rem; display: block; margin-bottom: 0.25rem;">{{ team.name
+                    }}</span>
                 {% if res.is_winner %}
-                <span class="badge badge-active" style="margin-left: 0.5rem;">Winner</span>
+                <span class="badge badge-active" style="display: inline-block;">Winner</span>
+                {% else %}
+                <span style="color: var(--text-muted); font-size: 0.8rem;">No return</span>
                 {% endif %}
             </div>
             <div style="text-align: right;">
-                <div
-                    style="font-weight: bold; font-size: 1.2rem; color: {{ 'var(--accent-color)' if res.payout > 0 else 'var(--text-muted)' }}">
+                <div class="balance-font"
+                    style="font-size: 1.4rem; color: {{ 'var(--accent-color)' if res.payout > 0 else 'var(--text-muted)' }}">
                     +${{ "%.2f"|format(res.payout) }}
                 </div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">
-                    New Balance: ${{ "%.2f"|format(team.money) }}
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    Balance: <span style="color: var(--text-color); font-weight: 600;">${{ "%.2f"|format(team.money)
+                        }}</span>
                 </div>
             </div>
         </div>
@@ -38,16 +46,24 @@
     </div>
 </div>
 
-<div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
-    <h3>Carryover to Next Round</h3>
-    <div style="font-size: 2rem; font-weight: bold; color: var(--secondary-color);">
-        ${{ "%.2f"|format(next_carryover) }}
+<div class="glass-card animate-fade-in"
+    style="animation-delay: 0.2s; background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(0,0,0,0));">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-muted);">CARRYOVER POOL</h3>
+            <div
+                style="font-size: 2.5rem; font-weight: 800; color: var(--secondary-color); font-family: 'Outfit', sans-serif; margin-top: 0.25rem;">
+                ${{ "%.2f"|format(next_carryover) }}
+            </div>
+        </div>
+        <div style="max-width: 250px; text-align: right; color: var(--text-muted); font-size: 0.9rem;">
+            This amount will be added to the winner's pool in the next round.
+        </div>
     </div>
-    <p style="color: var(--text-muted);">This amount will be added to the winner's pool in the next round.</p>
 </div>
 
-<div class="animate-fade-in" style="animation-delay: 0.3s; display: flex; gap: 1rem;">
+<div class="animate-fade-in" style="animation-delay: 0.3s;">
     <a href="{{ url_for('game_dashboard', game_id=game.id) }}" class="btn btn-primary"
-        style="flex: 1; text-align: center;">Continue to Dashboard</a>
+        style="width: 100%; padding: 1.25rem;">Continue to Dashboard</a>
 </div>
 {% endblock %}

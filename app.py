@@ -3,7 +3,7 @@ from models import db, Game, Team, Round, Bet
 import logic
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///betting_game_v2.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///investment_engine.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -24,6 +24,13 @@ def create_game():
         new_game = Game(name=name, status='active', carryover_pool=0, starting_money=starting_money)
         db.session.add(new_game)
         db.session.commit()
+    return redirect(url_for('home'))
+
+@app.route('/game/<int:game_id>/delete', methods=['POST'])
+def delete_game(game_id):
+    game = Game.query.get_or_404(game_id)
+    db.session.delete(game)
+    db.session.commit()
     return redirect(url_for('home'))
 
 @app.route('/game/<int:game_id>')
@@ -55,11 +62,11 @@ def start_round(game_id):
     # Create the round immediately to store options
     new_round = Round(
         game_id=game_id,
-        opt1=request.form.get('opt1', 'Option 1'),
-        opt2=request.form.get('opt2', 'Option 2'),
-        opt3=request.form.get('opt3', 'Option 3'),
-        opt4=request.form.get('opt4', 'Option 4'),
-        opt5=request.form.get('opt5', 'Option 5')
+        opt1=request.form.get('opt1', 'a'),
+        opt2=request.form.get('opt2', 'b'),
+        opt3=request.form.get('opt3', 'c'),
+        opt4=request.form.get('opt4', 'd'),
+        opt5=request.form.get('opt5', 'e')
     )
     db.session.add(new_round)
     db.session.commit()
@@ -74,18 +81,27 @@ def submit_round(game_id, round_id):
     correct_option = int(request.form.get('correct_option'))
     
     round_obj.correct_option = correct_option
+    round_obj.previous_carryover = game.carryover_pool
     
-    # Create Bets
+    # Create Investments (formerly bets)
+    bet_objs = {} # To keep track of created bets to update payouts later
     for team in teams:
         amount_val = request.form.get(f'bet_{team.id}', '')
         amount = float(amount_val) if amount_val else 0
+        
+        multiplier_val = request.form.get(f'multiplier_{team.id}', '1')
+        try:
+            multiplier = float(multiplier_val)
+        except ValueError:
+            multiplier = 1.0
+            
         option = int(request.form.get(f'option_{team.id}', 0))
-        is_all_in = request.form.get(f'all_in_{team.id}') == 'on'
         
         if amount > 0:
-            bet = Bet(round_id=round_obj.id, team_id=team.id, amount=amount, option_chosen=option, is_all_in=is_all_in)
+            bet = Bet(round_id=round_obj.id, team_id=team.id, amount=amount, option_chosen=option, multiplier=multiplier)
             db.session.add(bet)
             team.money -= amount
+            bet_objs[team.id] = bet
     
     db.session.commit()
     
@@ -95,12 +111,49 @@ def submit_round(game_id, round_id):
     # Apply Results
     game.carryover_pool = next_carryover
     for res in results:
-        team = Team.query.get(res['team_id'])
-        team.money += res['payout']
+        team_obj = Team.query.get(res['team_id'])
+        team_obj.money += res['payout']
+        if team_obj.id in bet_objs:
+            bet_objs[team_obj.id].payout = res['payout']
     
     db.session.commit()
     
     return render_template('results.html', game=game, results=results, next_carryover=next_carryover, correct_option=correct_option, round_obj=round_obj)
+
+@app.route('/team/<int:team_id>/edit_money', methods=['POST'])
+def edit_team_money(team_id):
+    team = Team.query.get_or_404(team_id)
+    new_money = request.form.get('money')
+    if new_money is not None:
+        try:
+            team.money = float(new_money)
+            db.session.commit()
+        except ValueError:
+            pass
+    return redirect(url_for('game_dashboard', game_id=team.game_id))
+
+@app.route('/game/<int:game_id>/round/undo', methods=['POST'])
+def undo_round(game_id):
+    game = Game.query.get_or_404(game_id)
+    # Get the last completed round (one with a correct_option set)
+    last_round = Round.query.filter(Round.game_id == game_id, Round.correct_option != None).order_by(Round.created_at.desc()).first()
+    
+    if last_round:
+        # Revert carryover
+        game.carryover_pool = last_round.previous_carryover
+        
+        # Revert team balances
+        for bet in last_round.bets:
+            team = Team.query.get(bet.team_id)
+            if team:
+                # Revert: Subtract payout, add back investment amount
+                team.money = team.money - bet.payout + bet.amount
+        
+        # Delete the round (cascades will delete bets)
+        db.session.delete(last_round)
+        db.session.commit()
+        
+    return redirect(url_for('game_dashboard', game_id=game_id))
 
 @app.route('/game/<int:game_id>/end')
 def end_game(game_id):
@@ -108,8 +161,18 @@ def end_game(game_id):
     game.status = 'finished'
     db.session.commit()
     
-    top_teams = Team.query.filter_by(game_id=game_id).order_by(Team.money.desc()).limit(3).all()
-    return render_template('leaderboard.html', game=game, top_teams=top_teams)
+    all_teams = Team.query.filter_by(game_id=game_id).order_by(Team.money.desc()).all()
+    
+    ranked_teams = []
+    current_rank = 0
+    previous_money = None
+    for i, team in enumerate(all_teams):
+        if team.money != previous_money:
+            current_rank = i + 1
+        ranked_teams.append({'team': team, 'rank': current_rank})
+        previous_money = team.money
+        
+    return render_template('leaderboard.html', game=game, ranked_teams=ranked_teams)
 
 if __name__ == '__main__':
     app.run(debug=True)

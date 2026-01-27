@@ -1,85 +1,120 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="animate-fade-in">
-    <a href="{{ url_for('game_dashboard', game_id=game.id) }}"
-        style="color: var(--primary-color); text-decoration: none; margin-bottom: 1rem; display: block;">&larr; Abort
-        Round</a>
-    <h1>Active Round - {{ game.name }}</h1>
-    <p style="color: var(--text-muted); margin-bottom: 2rem;">Moderator: Enter bets for each team and select the correct
-        option.</p>
+<div class="animate-fade-in" style="margin-bottom: 2rem;">
+    <a href="{{ url_for('game_dashboard', game_id=game.id) }}" class="btn"
+        style="background: rgba(255,255,255,0.05); color: var(--text-muted); padding: 0.5rem 1rem; margin-bottom: 1.5rem;">&larr;
+        Abort Round</a>
+    <h1 style="margin-bottom: 0.5rem;">Active Investment Round</h1>
+    <p style="color: var(--text-muted);">Allocate investments for each team and finalize the market outcome.</p>
 </div>
 
 <form action="{{ url_for('submit_round', game_id=game.id, round_id=round_obj.id) }}" method="POST">
-    <div class="glass-card animate-fade-in" style="animation-delay: 0.1s;">
-        <h2>Team Bets</h2>
-        <div style="display: grid; gap: 1rem;">
+    <div class="glass-card animate-fade-in" style="animation-delay: 0.1s; padding: 2rem;">
+        <h2 style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-color)">
+                <path d="M12 1v22m5-18H8.5a4.5 4.5 0 0 0 0 9h7a4.5 4.5 0 0 1 0 9H7"></path>
+            </svg>
+            Team Allocations
+        </h2>
+        <div style="display: grid; gap: 1.5rem;">
             {% for team in teams %}
-            <div class="glass-card" style="margin-bottom: 0px; padding: 1.5rem; background: rgba(255,255,255,0.03);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <span style="font-weight: bold; font-size: 1.2rem;">{{ team.name }}</span>
-                    <span style="color: var(--accent-color);">Balance: ${{ "%.2f"|format(team.money) }}</span>
+            <div
+                style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 1.5rem; border-radius: 1.25rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                    <span style="font-weight: 700; font-size: 1.2rem; color: var(--text-color);">{{ team.name }}</span>
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">Available: <span
+                            style="color: var(--accent-color); font-weight: 600;">${{ "%.2f"|format(team.money)
+                            }}</span></span>
                 </div>
-                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <div style="flex: 2; min-width: 200px;">
-                        <label style="font-size: 0.8rem; color: var(--text-muted);">Amount</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; align-items: end;">
+                    <div>
+                        <label
+                            style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;">Amount</label>
                         <input type="number" name="bet_{{ team.id }}" step="0.01" max="{{ team.money }}"
-                            placeholder="Bet Amount">
+                            placeholder="0.00" style="background: rgba(0,0,0,0.2);">
                     </div>
-                    <div style="flex: 1.5; min-width: 200px;">
-                        <label style="font-size: 0.8rem; color: var(--text-muted);">Option Choice</label>
-                        <select name="option_{{ team.id }}"
-                            style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.2); color: white; outline: none;">
-                            <option value="0">No Bet</option>
-                            <option value="1">1: {{ round_obj.opt1 }}</option>
-                            <option value="2">2: {{ round_obj.opt2 }}</option>
-                            <option value="3">3: {{ round_obj.opt3 }}</option>
-                            <option value="4">4: {{ round_obj.opt4 }}</option>
-                            <option value="5">5: {{ round_obj.opt5 }}</option>
+                    <div>
+                        <label
+                            style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;">Outcome
+                            Selection</label>
+                        <select name="option_{{ team.id }}" style="background: rgba(0,0,0,0.2);">
+                            <option value="0">No Investment</option>
+                            <option value="1">{{ round_obj.opt1 }}</option>
+                            <option value="2">{{ round_obj.opt2 }}</option>
+                            <option value="3">{{ round_obj.opt3 }}</option>
+                            <option value="4">{{ round_obj.opt4 }}</option>
+                            <option value="5">{{ round_obj.opt5 }}</option>
                         </select>
                     </div>
-                    <div style="flex: 0.5; display: flex; align-items: flex-end; padding-bottom: 10px;">
-                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                            <input type="checkbox" name="all_in_{{ team.id }}" style="width: 20px; height: 20px;">
-                            <span>All-In</span>
-                        </label>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 100px;">
+                        <label
+                            style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;">Multiplier</label>
+                        <input type="number" name="multiplier_{{ team.id }}" step="0.1" value="1.0"
+                            style="background: rgba(0,0,0,0.2); text-align: center;">
                     </div>
+                </div>
+                <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
+                    <button type="button"
+                        onclick="document.querySelector('[name=\'bet_{{ team.id }}\']').value = '{{ team.money }}'"
+                        style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--text-muted); padding: 0.35rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;"
+                        onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='var(--text-color)'"
+                        onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='var(--text-muted)'">
+                        Invest All (${{ "%.2f"|format(team.money) }})
+                    </button>
                 </div>
             </div>
             {% endfor %}
         </div>
     </div>
 
-    <div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
-        <h2>Correct Option</h2>
-        <p style="color: var(--text-muted); margin-bottom: 1rem;">Select WHICH option was actually correct:</p>
-        <div style="display: grid; gap: 0.5rem;">
+    <div class="glass-card animate-fade-in" style="animation-delay: 0.2s; padding: 2rem;">
+        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-color)">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Correct Outcome
+        </h2>
+        <div style="display: grid; gap: 0.75rem;">
             {% for i in range(1, 6) %}
-            <label class="btn"
-                style="text-align: left; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; gap: 1rem; padding: 1rem;">
-                <input type="radio" name="correct_option" value="{{ i }}" required style="width: 20px; height: 20px;">
-                <span>{{ i }}: {% if i==1 %}{{ round_obj.opt1 }}{% elif i==2 %}{{ round_obj.opt2 }}{% elif i==3 %}{{
+            <label class="outcome-label"
+                style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 1rem; cursor: pointer; transition: all 0.2s ease;">
+                <input type="radio" name="correct_option" value="{{ i }}" required
+                    style="width: 1.25rem; height: 1.25rem; cursor: pointer; accent-color: var(--primary-color);">
+                <span style="font-weight: 500; color: var(--text-muted); flex-grow: 1;">{% if i==1 %}{{
+                    round_obj.opt1 }}{% elif i==2 %}{{ round_obj.opt2 }}{% elif i==3 %}{{
                     round_obj.opt3 }}{% elif i==4 %}{{ round_obj.opt4 }}{% else %}{{ round_obj.opt5 }}{% endif %}</span>
             </label>
             {% endfor %}
         </div>
     </div>
 
-    <div class="animate-fade-in" style="animation-delay: 0.3s;">
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1.5rem; font-size: 1.2rem;">Calculate
-            Payouts</button>
-    </div>
+    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1.5rem; font-size: 1.25rem;">
+        Process Outcomes & Finalize Round
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" style="margin-left: 0.5rem;">
+            <path d="m5 12 5 5L20 7"></path>
+        </svg>
+    </button>
 </form>
 
 <style>
-    input[type="radio"]:checked+span {
-        color: var(--primary-color);
-        font-weight: bold;
+    .outcome-label:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
     }
 
-    label:has(input[type="radio"]:checked) {
-        border-color: var(--primary-color) !important;
+    .outcome-label:has(input:checked) {
         background: rgba(99, 102, 241, 0.1) !important;
+        border-color: var(--primary-color) !important;
+    }
+
+    .outcome-label:has(input:checked) span {
+        color: var(--text-color) !important;
+        font-weight: 600 !important;
     }
 </style>
 {% endblock %}
