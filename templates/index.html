@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="animate-fade-in">
+    <h1>Betting Management Engine</h1>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Manage bets, teams, and payouts with ease.</p>
+</header>
+
+<div class="glass-card animate-fade-in" style="animation-delay: 0.1s;">
+    <h2>Create New Game</h2>
+    <form action="{{ url_for('create_game') }}" method="POST">
+        <div class="input-group">
+            <input type="text" name="name" placeholder="Game Name (e.g., Chess Tournament)" required>
+        </div>
+        <div class="input-group">
+            <input type="number" name="starting_money" placeholder="Default Starting Money (e.g., 1000)" step="0.01" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Game</button>
+    </form>
+</div>
+
+<div class="animate-fade-in" style="animation-delay: 0.2s;">
+    <h2>Existing Games</h2>
+    <div class="game-list">
+        {% for game in games %}
+        <a href="{{ url_for('game_dashboard', game_id=game.id) }}" class="glass-card game-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>{{ game.name }}</h3>
+                <span class="badge badge-{{ game.status }}">{{ game.status.capitalize() }}</span>
+            </div>
+            <p style="color: var(--text-muted);">Teams: {{ game.teams|length }}</p>
+            <p style="color: var(--text-muted);">Pool Carryover: ${{ game.carryover_pool }}</p>
+        </a>
+        {% else %}
+        <p>No games found. Create one above!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

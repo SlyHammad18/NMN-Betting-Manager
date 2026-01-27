@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <a href="{{ url_for('game_dashboard', game_id=game.id) }}"
+        style="color: var(--primary-color); text-decoration: none; margin-bottom: 1rem; display: block;">&larr; Back to
+        Dashboard</a>
+    <h1>Round Setup - {{ game.name }}</h1>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Define the 5 possible outcomes for this round.</p>
+</div>
+
+<form action="{{ url_for('start_round', game_id=game.id) }}" method="POST" class="animate-fade-in"
+    style="animation-delay: 0.1s;">
+    <div class="glass-card">
+        <h2>Enter Labels</h2>
+        <div style="display: grid; gap: 1rem;">
+            <div class="input-group">
+                <label style="color: var(--text-muted); font-size: 0.9rem;">Option 1</label>
+                <input type="text" name="opt1" placeholder="e.g., Home Team Wins" required>
+            </div>
+            <div class="input-group">
+                <label style="color: var(--text-muted); font-size: 0.9rem;">Option 2</label>
+                <input type="text" name="opt2" placeholder="e.g., Away Team Wins" required>
+            </div>
+            <div class="input-group">
+                <label style="color: var(--text-muted); font-size: 0.9rem;">Option 3</label>
+                <input type="text" name="opt3" placeholder="e.g., Draw" required>
+            </div>
+            <div class="input-group">
+                <label style="color: var(--text-muted); font-size: 0.9rem;">Option 4</label>
+                <input type="text" name="opt4" placeholder="e.g., Over 2.5 Goals" required>
+            </div>
+            <div class="input-group">
+                <label style="color: var(--text-muted); font-size: 0.9rem;">Option 5</label>
+                <input type="text" name="opt5" placeholder="e.g., Both Teams to Score" required>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1.5rem; font-size: 1.2rem;">Start
+        Betting</button>
+</form>
+{% endblock %}

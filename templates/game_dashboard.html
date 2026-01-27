@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <a href="{{ url_for('home') }}"
+        style="color: var(--primary-color); text-decoration: none; margin-bottom: 1rem; display: block;">&larr; Back to
+        Games</a>
+    <h1>{{ game.name }}</h1>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Game Status: <span
+            class="badge badge-{{ game.status }}">{{ game.status.capitalize() }}</span></p>
+</div>
+
+<div class="glass-card animate-fade-in" style="animation-delay: 0.1s;">
+    <h2>Teams</h2>
+    <div style="margin-bottom: 2rem;">
+        {% for team in teams %}
+        <div class="glass-card"
+            style="padding: 1rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
+            <div>
+                <span style="font-weight: bold; font-size: 1.1rem;">{{ team.name }}</span>
+            </div>
+            <div style="color: var(--accent-color); font-weight: bold; font-size: 1.1rem;">
+                ${{ "%.2f"|format(team.money) }}
+            </div>
+        </div>
+        {% else %}
+        <p style="color: var(--text-muted);">No teams added yet.</p>
+        {% endfor %}
+    </div>
+
+    <h3>Add Team</h3>
+    <form action="{{ url_for('add_team', game_id=game.id) }}" method="POST" style="display: flex; gap: 1rem;">
+        <div style="flex: 1;">
+            <input type="text" name="name" placeholder="Team Name" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+</div>
+
+{% if teams|length >= 1 %}
+<div class="glass-card animate-fade-in" style="animation-delay: 0.2s; border-color: var(--primary-color);">
+    <h2>Start Round</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Begin a new betting round for all teams.</p>
+    <a href="{{ url_for('setup_round', game_id=game.id) }}" class="btn btn-primary"
+        style="width: 100%; text-align: center;">New Round</a>
+</div>
+
+<div class="glass-card animate-fade-in" style="animation-delay: 0.3s; border-color: var(--error-color);">
+    <h2>End Game</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Finish the game and show final leaderboard.</p>
+    <a href="{{ url_for('end_game', game_id=game.id) }}" class="btn"
+        style="background: var(--error-color); color: white; width: 100%; text-align: center;">End Game & View
+        Results</a>
+</div>
+{% endif %}
+{% endblock %}
