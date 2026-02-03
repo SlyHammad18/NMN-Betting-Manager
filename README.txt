@@ -5,14 +5,9 @@ A dark, modern betting management system for moderators.
 
 SETUP INSTRUCTIONS:
 -------------------
-1. Install dependencies:
-   pip install -r requirements.txt
-
-2. Run the application:
-   python app.py
-
-3. Open in browser:
-   http://127.0.0.1:5000
+1. Run install.bat
+2. Run start_app.bat
+3. Open in browser: http://127.0.0.1:5000
 
 FEATURES:
 ---------

@@ -100,7 +100,7 @@ def submit_round(game_id, round_id):
         if amount > 0:
             bet = Bet(round_id=round_obj.id, team_id=team.id, amount=amount, option_chosen=option, multiplier=multiplier)
             db.session.add(bet)
-            team.money -= amount
+            team.money = round(team.money - amount, 2)
             bet_objs[team.id] = bet
     
     db.session.commit()
@@ -126,7 +126,7 @@ def edit_team_money(team_id):
     new_money = request.form.get('money')
     if new_money is not None:
         try:
-            team.money = float(new_money)
+            team.money = round(float(new_money), 2)
             db.session.commit()
         except ValueError:
             pass
@@ -147,7 +147,7 @@ def undo_round(game_id):
             team = Team.query.get(bet.team_id)
             if team:
                 # Revert: Subtract payout, add back investment amount
-                team.money = team.money - bet.payout + bet.amount
+                team.money = round(team.money - bet.payout + bet.amount, 2)
         
         # Delete the round (cascades will delete bets)
         db.session.delete(last_round)

@@ -33,14 +33,14 @@
                     <div>
                         <label
                             style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;">Amount</label>
-                        <input type="number" name="bet_{{ team.id }}" step="0.01" max="{{ team.money }}"
-                            placeholder="0.00" style="background: rgba(0,0,0,0.2);">
+                        <input type="number" name="bet_{{ team.id }}" step="0.01" max="{{ " %.2f"|format(team.money) }}"
+                            placeholder="0.00">
                     </div>
                     <div>
                         <label
                             style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;">Outcome
                             Selection</label>
-                        <select name="option_{{ team.id }}" style="background: rgba(0,0,0,0.2);">
+                        <select name="option_{{ team.id }}">
                             <option value="0">No Investment</option>
                             <option value="1">{{ round_obj.opt1 }}</option>
                             <option value="2">{{ round_obj.opt2 }}</option>
@@ -53,16 +53,17 @@
                         <label
                             style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;">Multiplier</label>
                         <input type="number" name="multiplier_{{ team.id }}" step="0.1" value="1.0"
-                            style="background: rgba(0,0,0,0.2); text-align: center;">
+                            style="text-align: center;">
                     </div>
                 </div>
                 <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
+                    {% set formatted_money = "%.2f"|format(team.money) %}
                     <button type="button"
-                        onclick="document.querySelector('[name=\'bet_{{ team.id }}\']').value = '{{ team.money }}'"
+                        onclick="document.querySelector('[name=\'bet_{{ team.id }}\']').value = '{{ formatted_money }}'"
                         style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--text-muted); padding: 0.35rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;"
                         onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='var(--text-color)'"
                         onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='var(--text-muted)'">
-                        Invest All (${{ "%.2f"|format(team.money) }})
+                        Invest All (${{ formatted_money }})
                     </button>
                 </div>
             </div>

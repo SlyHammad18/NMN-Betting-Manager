@@ -33,10 +33,10 @@ def calculate_round_results(round_obj, carryover_pool):
             
             results.append({
                 'team_id': bet.team_id,
-                'payout': final_payout,
+                'payout': round(final_payout, 2),
                 'is_winner': True
             })
-            total_payout += final_payout
+            total_payout += round(final_payout, 2)
         
         next_carryover = max(0, current_round_pool - total_payout)
     else:
@@ -49,4 +49,4 @@ def calculate_round_results(round_obj, carryover_pool):
                 'is_winner': False
             })
 
-    return results, next_carryover
+    return results, round(next_carryover, 2)

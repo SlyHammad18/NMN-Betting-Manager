@@ -52,7 +52,7 @@
                                 Balance</label>
                             <div style="display: flex; gap: 0.5rem;">
                                 <input type="number" name="money" value="{{ team.money }}" step="0.01"
-                                    style="flex: 1; padding: 0.5rem; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: white; font-size: 0.9rem;">
+                                    style="flex: 1; padding: 0.5rem; font-size: 0.9rem;">
                                 <button type="submit" class="btn btn-primary" style="padding: 0.5rem; min-width: 44px;">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -75,7 +75,7 @@
 
     <form action="{{ url_for('add_team', game_id=game.id) }}" method="POST" style="display: flex; gap: 0.75rem;">
         <div style="flex: 1;">
-            <input type="text" name="name" placeholder="Enter Team Name" required style="background: rgba(0,0,0,0.2);">
+            <input type="text" name="name" placeholder="Enter Team Name" required>
         </div>
         <button type="submit" class="btn btn-primary" style="padding-left: 2rem; padding-right: 2rem;">Add Team</button>
     </form>
